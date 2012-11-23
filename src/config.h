@@ -69,6 +69,9 @@ HAVE_DHCP
 HAVE_DHCP6
    define this to get dnsmasq's DHCPv6 server. (implies HAVE_DHCP).
 
+HAVE_AHCP
+   define this to get dnsmasq's AHCP server.
+
 HAVE_SCRIPT
    define this to get the ability to call scripts on lease-change.
 
@@ -119,13 +122,13 @@ RESOLVFILE
 #define HAVE_DHCP6 
 #define HAVE_TFTP
 #define HAVE_SCRIPT
+#define HAVE_AHCP
+
 /* #define HAVE_LUASCRIPT */
 /* #define HAVE_BROKEN_RTC */
 /* #define HAVE_DBUS */
 /* #define HAVE_IDN */
 /* #define HAVE_CONNTRACK */
-
-
 
 /* Default locations for important system files. */
 

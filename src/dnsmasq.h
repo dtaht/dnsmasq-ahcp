@@ -679,6 +679,9 @@ struct dhcp_context {
 #define CONTEXT_RA_STATELESS 128
 #define CONTEXT_DHCP         256
 #define CONTEXT_DEPRECATE    512
+#ifdef HAVE_AHCP
+#define CONTEXT_AHCP	    1024
+#endif
 
 struct ping_result {
   struct in_addr addr;
@@ -828,6 +831,14 @@ extern struct daemon {
 
   /* utility string buffer, hold max sized IP address as string */
   char *addrbuff;
+
+#ifdef HAVE_AHCP
+  int ahcp;
+  int ahuid_len;
+  unsigned char *ahuid;
+  struct iovec ahcppacket;
+  int ahcpfd;
+#endif
 
 } *daemon;
 

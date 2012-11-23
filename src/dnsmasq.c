@@ -84,10 +84,16 @@ int main (int argc, char **argv)
 
   daemon->addrbuff = safe_malloc(ADDRSTRLEN);
 
+#ifdef HAVE_AHCP
+#define LEASE_CHECK  daemon->dhcp || daemon->dhcp6 || daemon->ahcp
+#else
+#define LEASE_CHECK  daemon->dhcp || daemon->dhcp6
+#endif
+
 #ifdef HAVE_DHCP
   if (!daemon->lease_file)
     {
-      if (daemon->dhcp || daemon->dhcp6)
+      if (LEASE_CHECK)
 	daemon->lease_file = LEASEFILE;
     }
 #endif
@@ -152,7 +158,7 @@ int main (int argc, char **argv)
   now = dnsmasq_time();
   
 #ifdef HAVE_DHCP
-  if (daemon->dhcp || daemon->dhcp6)
+  if (LEASE_CHECK)
     {
       /* Note that order matters here, we must call lease_init before
 	 creating any file descriptors which shouldn't be leaked
@@ -188,6 +194,11 @@ int main (int argc, char **argv)
 
 #  endif
 
+#ifdef HAVE_AHCP
+  if (daemon->ahcp)
+    ahcp_init();
+#endif
+
 #endif
 
 #ifdef HAVE_LINUX_NETWORK
@@ -206,7 +217,7 @@ int main (int argc, char **argv)
 
 #ifdef HAVE_DHCP
   /* after netlink_init */
-  if (daemon->dhcp || daemon->dhcp6)
+  if (LEASE_CHECK)
     lease_find_interfaces(now);
 #endif
 
@@ -261,7 +272,7 @@ int main (int argc, char **argv)
 
 #if defined(HAVE_SCRIPT)
   /* Note getpwnam returns static storage */
-  if ((daemon->dhcp || daemon->dhcp6) && 
+  if ((LEASE_CHECK) && 
       daemon->scriptuser && 
       (daemon->lease_change_command || daemon->luascript))
     {
@@ -447,7 +458,7 @@ int main (int argc, char **argv)
    /* if we are to run scripts, we need to fork a helper before dropping root. */
   daemon->helperfd = -1;
 #ifdef HAVE_SCRIPT 
-  if ((daemon->dhcp || daemon->dhcp6) && (daemon->lease_change_command || daemon->luascript))
+  if ((LEASE_CHECK) && (daemon->lease_change_command || daemon->luascript))
     daemon->helperfd = create_helper(pipewrite, err_pipe[1], script_uid, script_gid, max_fd);
 #endif
 
@@ -817,6 +828,14 @@ int main (int argc, char **argv)
 	}
 #endif
 
+#ifdef HAVE_AHCP
+      if (daemon->ahcp)
+	{
+	  FD_SET(daemon->ahcpfd, &rset);
+	  bump_maxfd(daemon->ahcpfd, &maxfd);
+	}
+#endif
+
 #ifdef HAVE_LINUX_NETWORK
       FD_SET(daemon->netlinkfd, &rset);
       bump_maxfd(daemon->netlinkfd, &maxfd);
@@ -927,6 +946,11 @@ int main (int argc, char **argv)
 
       if (daemon->ra_contexts && FD_ISSET(daemon->icmp6fd, &rset))
 	icmp6_packet();
+#endif
+
+#ifdef HAVE_AHCP
+      if (daemon->ahcp && FD_ISSET(daemon->ahcpfd, &rset))
+	ahcp_packet(now);
 #endif
 
 #  ifdef HAVE_SCRIPT
