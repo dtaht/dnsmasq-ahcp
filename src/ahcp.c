@@ -86,9 +86,16 @@ void ahcp_init(void)
   daemon->ahcpfd = fd;
 }
 
+unsigned short ahcp_reply(struct dhcp_context *context, int interface, 
+			  char *iface_name, struct in6_addr *fallback, 
+			  size_t sz, int is_unicast, time_t now)
+{
+return 0;
+}
+
+
 /* Everything after this point is wrong. Just a copy paste from
    the dhcp code while I tried to figure out the dnsmasq state machine */
-
 void ahcp_packet(time_t now)
 {
   struct dhcp_context *context;
@@ -194,6 +201,8 @@ void ahcp_packet(time_t now)
     }
 }
 
+/* This needs to be modified to work like AHCP */
+
 static int complete_context6(struct in6_addr *local,  int prefix,
 			     int scope, int if_index, int dad, void *vparam)
 {
@@ -241,12 +250,13 @@ static int complete_context6(struct in6_addr *local,  int prefix,
   return 1;
 }
 
+#if NOTHING
+
+
 /* While the structure of the code is good, the algorithm for AHCP
    is rather different, so...
 
 */
-
-#if NOTHING
 
 struct dhcp_config *config_find_by_address6(struct dhcp_config *configs, struct in6_addr *net, int prefix, u64 addr)
 {

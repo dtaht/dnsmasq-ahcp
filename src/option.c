@@ -121,6 +121,14 @@ struct myoption {
 #define LOPT_RR        310
 #define LOPT_CLVERBIND 311
 #define LOPT_MAXCTTL   312
+#define LOPT_AHCPPREFIX	313
+#define LOPT_AHCPNTP	314
+#define LOPT_AHCPID	316
+#define LOPT_AHCPMODE	317
+#define LOPT_AHCPPROTO	318
+#define LOPT_AHCPIFACE	319
+#define LOPT_AHCPDNS	320
+#define LOPT_AHCPIDFILE	321
 
 #ifdef HAVE_GETOPT_LONG
 static const struct option opts[] =  
@@ -247,6 +255,16 @@ static const struct myoption opts[] =
     { "dhcp-duid", 1, 0, LOPT_DUID },
     { "host-record", 1, 0, LOPT_HOST_REC },
     { "bind-dynamic", 0, 0, LOPT_CLVERBIND },
+#ifdef HAVE_AHCP
+    { "ahcp-name-server", 1, 0, LOPT_AHCPDNS },
+    { "ahcp-mode", 1, 0, LOPT_AHCPMODE },
+    { "ahcp-protocols", 1, 0, LOPT_AHCPPROTO },
+    { "ahcp-interface", 1, 0, LOPT_AHCPIFACE },
+    { "ahcp-ntp-server", 1, 0, LOPT_AHCPNTP },
+    { "ahcp-prefix", 1, 0, LOPT_AHCPPREFIX },
+    { "ahcp-id", 1, 0, LOPT_AHCPID },
+    { "ahcp-id-file", 1, 0, LOPT_AHCPIDFILE },
+#endif
     { NULL, 0, 0, 0 }
   };
 
@@ -379,6 +397,16 @@ static struct {
   { LOPT_HOST_REC, ARG_DUP, "<name>,<address>", gettext_noop("Specify host (A/AAAA and PTR) records"), NULL },
   { LOPT_RR, ARG_DUP, "<name>,<RR-number>,[<data>]", gettext_noop("Specify arbitrary DNS resource record"), NULL },
   { LOPT_CLVERBIND, OPT_CLEVERBIND, NULL, gettext_noop("Bind to interfaces in use - check for new interfaces"), NULL},
+#ifdef HAVE_AHCP
+  { LOPT_AHCPIFACE, ARG_DUP, "<interface>,...", gettext_noop("Specify AHCP interface(s) to listen on.") , NULL },
+  { LOPT_AHCPNTP, ARG_DUP, "<ntp server>,...", gettext_noop("Specify AHCP NTP server") , NULL },
+  { LOPT_AHCPDNS, ARG_DUP, "<dns server>,...", gettext_noop("Specify AHCP dns server") , NULL },
+  { LOPT_AHCPID, ARG_DUP, "<ahcp_id>", gettext_noop("Specify AHCP ID") , NULL },
+  { LOPT_AHCPMODE, ARG_DUP, "<mode>", gettext_noop("Specify AHCP mode - server, forwarder, client") , NULL },
+  { LOPT_AHCPPROTO, ARG_DUP, "<protocol>", gettext_noop("Specify IP protocols to serve via AHCP - 4,6, or 46") , NULL },
+  { LOPT_AHCPPREFIX, ARG_DUP, "<addr/prefix>,...", gettext_noop("Specify IP prefix to use") , NULL },
+  { LOPT_AHCPIDFILE, ARG_DUP, "<path>", gettext_noop("Specify AHCP ID file path") , NULL },
+#endif
   { 0, 0, NULL, NULL, NULL }
 }; 
 
@@ -3183,7 +3211,18 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
 	daemon->host_records_tail = new;
 	break;
       }
-      
+#ifdef HAVE_AHCP
+    case LOPT_AHCPPREFIX:
+    case LOPT_AHCPNTP:
+    case LOPT_AHCPID:
+    case LOPT_AHCPMODE:
+    case LOPT_AHCPPROTO:
+    case LOPT_AHCPIFACE:
+    case LOPT_AHCPDNS:
+	comma = split(arg);
+	break;
+#endif
+
     default:
       ret_err(_("unsupported option (check that dnsmasq was compiled with DHCP/TFTP/DBus support)"));
       

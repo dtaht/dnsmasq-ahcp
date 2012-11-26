@@ -836,7 +836,7 @@ extern struct daemon {
   int ahcp;
   int ahuid_len;
   unsigned char *ahuid;
-  struct iovec ahcppacket;
+  struct iovec ahcp_packet;
   int ahcpfd;
 #endif
 
