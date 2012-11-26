@@ -129,6 +129,7 @@ struct myoption {
 #define LOPT_AHCPIFACE	319
 #define LOPT_AHCPDNS	320
 #define LOPT_AHCPIDFILE	321
+#define LOPT_AHCPCLIFACE	322
 
 #ifdef HAVE_GETOPT_LONG
 static const struct option opts[] =  
@@ -264,6 +265,7 @@ static const struct myoption opts[] =
     { "ahcp-prefix", 1, 0, LOPT_AHCPPREFIX },
     { "ahcp-id", 1, 0, LOPT_AHCPID },
     { "ahcp-id-file", 1, 0, LOPT_AHCPIDFILE },
+    { "ahcp-client-interface", 1, 0, LOPT_AHCPCLIFACE },
 #endif
     { NULL, 0, 0, 0 }
   };
@@ -399,6 +401,7 @@ static struct {
   { LOPT_CLVERBIND, OPT_CLEVERBIND, NULL, gettext_noop("Bind to interfaces in use - check for new interfaces"), NULL},
 #ifdef HAVE_AHCP
   { LOPT_AHCPIFACE, ARG_DUP, "<interface>,...", gettext_noop("Specify AHCP interface(s) to listen on.") , NULL },
+  { LOPT_AHCPCLIFACE, ARG_DUP, "<interface>,...", gettext_noop("Specify AHCP interface for client requests") , NULL },
   { LOPT_AHCPNTP, ARG_DUP, "<ntp server>,...", gettext_noop("Specify AHCP NTP server") , NULL },
   { LOPT_AHCPDNS, ARG_DUP, "<dns server>,...", gettext_noop("Specify AHCP dns server") , NULL },
   { LOPT_AHCPID, ARG_DUP, "<ahcp_id>", gettext_noop("Specify AHCP ID") , NULL },
