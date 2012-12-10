@@ -15,10 +15,10 @@
 */
 
 #include "dnsmasq.h"
+#include <netdb.h>
 #include "ahcp-protocol.h"
 
 #ifdef HAVE_AHCP
-
 
 struct iface_param {
   struct dhcp_context *current;
@@ -34,6 +34,18 @@ char *config_script = "/etc/ahcp/ahcp-config.sh";
 struct config_data *config;
 config = parse_message(0, body, bodylen, interfaces);
 */
+
+// FIXME: there has got to be a standard function for this
+
+static int is_4mapped(struct in6_addr s) {
+    char hostbuf[NI_MAXHOST];
+    char *host = hostbuf;
+    if (getnameinfo(addr, addrlen, hostbuf, sizeof(hostbuf), NULL, 0, NI_NUMERICHOST))
+	if (strncmp(hostbuf, "::ffff:", strlen("::ffff:")) == 0)
+	    host = hostbuf + strlen("::ffff:");
+    if (host == hostbuf) return 0;
+    return 1;
+}
 
 static int complete_context6(struct in6_addr *local,  int prefix,
 			     int scope, int if_index, int dad, void *vparam);
@@ -143,7 +155,7 @@ void ahcp_packet(time_t now)
     if (tmp->name && (strcmp(tmp->name, ifr.ifr_name) == 0))
       return;
 
-  for (tmp = daemon->dhcp_except; tmp; tmp = tmp->next)
+  for (tmp = daemon->ahcp_except; tmp; tmp = tmp->next)
     if (tmp->name && (strcmp(tmp->name, ifr.ifr_name) == 0))
       return;
  

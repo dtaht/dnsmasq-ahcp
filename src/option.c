@@ -3215,15 +3215,70 @@ static int one_opt(int option, char *arg, char *errstr, char *gen_err, int comma
 	break;
       }
 #ifdef HAVE_AHCP
-    case LOPT_AHCPPREFIX:
-    case LOPT_AHCPNTP:
     case LOPT_AHCPID:
     case LOPT_AHCPMODE:
-    case LOPT_AHCPPROTO:
-    case LOPT_AHCPIFACE:
+    case LOPT_AHCPPROTO: break;
+    case LOPT_AHCPPREFIX:
+      comma = split(arg);
+      if (comma)
+        {
+          struct tftp_prefix *new = opt_malloc(sizeof(struct tftp_prefix));
+          new->interface = opt_string_alloc(comma);
+          new->prefix = opt_string_alloc(arg);
+          new->next = daemon->ahcp_if_prefix;
+          daemon->ahcp_if_prefix = new;
+        }
+      else
+        daemon->ahcp_prefix = opt_string_alloc(arg);
+      break;
+
     case LOPT_AHCPDNS:
-	comma = split(arg);
-	break;
+      comma = split(arg);
+      if (comma)
+        {
+          struct tftp_prefix *new = opt_malloc(sizeof(struct tftp_prefix));
+          new->interface = opt_string_alloc(comma);
+          new->prefix = opt_string_alloc(arg);
+          new->next = daemon->ahcp_if_prefix;
+          daemon->ahcp_dns = new;
+        }
+      else
+        daemon->ahcp_dns = opt_string_alloc(arg);
+      break;
+
+    case LOPT_AHCPNTP:
+      comma = split(arg);
+      if (comma)
+        {
+          struct tftp_prefix *new = opt_malloc(sizeof(struct tftp_prefix));
+          new->interface = opt_string_alloc(comma);
+          new->prefix = opt_string_alloc(arg);
+          new->next = daemon->ahcp_if_prefix;
+          daemon->ahcp_if_prefix = new;
+        }
+      else
+        daemon->ahcp_prefix = opt_string_alloc(arg);
+      break;
+
+    case LOPT_AHCPIFACE:
+      do {
+        struct iname *new = opt_malloc(sizeof(struct iname));
+        comma = split(arg);
+        new->name = opt_string_alloc(arg);
+        if (option == LOPT_AHCPIFACE)
+          {
+            new->next = daemon->if_ahcp_except;
+            daemon->if_ahcp_except = new;
+          }
+        else
+          {
+            new->next = daemon->ahcp_except;
+            daemon->ahcp_except = new;
+          }
+        arg = comma;
+      } while (arg);
+      break;
+
 #endif
 
     default:

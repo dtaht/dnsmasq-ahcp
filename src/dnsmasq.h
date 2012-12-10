@@ -838,6 +838,10 @@ extern struct daemon {
   unsigned char *ahuid;
   struct iovec ahcp_packet;
   int ahcpfd;
+  char *ahcp_unique_id_file;
+  char *ahcp_config_script;
+  struct iname *if_ahcp_except, *ahcp_except;
+  struct tftp_prefix *ahcp_if_prefix, *ahcp_prefix, *ahcp_dns;
 #endif
 
 } *daemon;

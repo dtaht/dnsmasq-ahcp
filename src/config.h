@@ -109,6 +109,7 @@ NO_LARGEFILE
 LEASEFILE
 CONFFILE
 RESOLVFILE
+AHCP_UNIQUE_ID_FILE
    the default locations of these files are determined below, but may be overridden 
    in a build command line using COPTS.
 
@@ -141,6 +142,18 @@ RESOLVFILE
 #      define LEASEFILE "/data/misc/dhcp/dnsmasq.leases"
 #   else
 #      define LEASEFILE "/var/lib/misc/dnsmasq.leases"
+#   endif
+#endif
+
+#ifndef AHCP_UNIQUE_ID_FILE
+#   if defined(__FreeBSD__) || defined (__OpenBSD__) || defined(__DragonFly__) || defined(__NetBSD__)
+#      define AHCP_UNIQUE_ID_FILE "/var/db/ahcp-unique-id"
+#   elif defined(__sun__) || defined (__sun)
+#      define AHCP_UNIQUE_ID_FILE "/var/cache/ahcp-unique-id"
+#   elif defined(__ANDROID__)
+#      define AHCP_UNIQUE_ID_FILE "/data/misc/dhcp/ahcp-unique-id"
+#   else
+#      define AHCP_UNIQUE_ID_FILE "/var/lib/misc/ahcp-unique-id"
 #   endif
 #endif
 
