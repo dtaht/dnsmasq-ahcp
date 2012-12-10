@@ -37,10 +37,10 @@ config = parse_message(0, body, bodylen, interfaces);
 
 // FIXME: there has got to be a standard function for this
 
-static int is_4mapped(struct in6_addr s) {
+static int is_4mapped(struct sockaddr_in6 s) {
     char hostbuf[NI_MAXHOST];
     char *host = hostbuf;
-    if (getnameinfo(addr, addrlen, hostbuf, sizeof(hostbuf), NULL, 0, NI_NUMERICHOST))
+    if (getnameinfo(s, 16, hostbuf, sizeof(hostbuf), NULL, 0, NI_NUMERICHOST))
 	if (strncmp(hostbuf, "::ffff:", strlen("::ffff:")) == 0)
 	    host = hostbuf + strlen("::ffff:");
     if (host == hostbuf) return 0;
